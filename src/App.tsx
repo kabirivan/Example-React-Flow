@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState, useCallback, useRef } from 'react';
 import './App.css';
-import ReactFlow, { removeElements, Connection, Edge, Elements, Position } from 'react-flow-renderer';
+import ReactFlow, { removeElements, Connection, Edge, Elements, Position, addEdge, isNode } from 'react-flow-renderer';
 
 const initialElements = [
   {
@@ -24,48 +24,82 @@ const initialElements = [
   // },
 ];
 let id = 2;
-let idNode = 1;
+let idEdge = 1;
 const getNodeId = () => `node_${id++}`;
-const getEdgeId = () => `edge_${idNode++}`;
+const getEdgeId = () => `edge_${idEdge++}`;
 
 function App() {
   const [elements, setElements] = useState<Elements>(initialElements);
   const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
-  // const onConnect = (params: Edge<any> | Connection) => setElements((els) => addEdge(params, els));
-  const yPos = useRef(50);
+  const onConnect = (params: Edge<any> | Connection) => setElements((els) => addEdge(params, els));
+  const yPos = useRef(100);
 
-  
+  const extractNumber = (nodeName) => {
+    const matches = nodeName.match(/\d+/g);
+    return matches[0]
+  }
+
+  console.log('elements', elements);
+
   const addNode = useCallback(() => {
-    yPos.current += 50;
+    yPos.current += 100;
     setElements((els) => {
-      console.log('elements', els);
+      const newNode = getNodeId()
+      console.log('source', `node_${extractNumber(newNode) - 1}`);
+      console.log('target', newNode);
       return [
         ...els,
         {
-          id: getNodeId(),
-          type: 'output',
+          id: newNode,
+          type: 'default',
           position: { x: 500, y: yPos.current },
           data: { label: <div>Default Node</div> },
+        },
+        {
+          id: getEdgeId(),
+          source: `node_${extractNumber(newNode) - 1}`,
+          target: newNode,
+          animated: false
         }
       ];
     });
-    
+    // addEdgeAutomatic()
   }, []);
 
 
-  const addEdge = useCallback(({ source, target }) => {
+
+
+
+
+  // const addEdge = useCallback(({ source, target }) => {
+  //   setElements((els) => {
+  //     console.log(source, target);
+  //     return [
+  //       ...els,
+  //       {
+  //         id: getEdgeId(),
+  //         source,
+  //         target
+  //       }
+  //     ];
+  //   });
+  // }, []);
+
+
+  const addEdgeAutomatic = () => {
     setElements((els) => {
-      console.log(source, target);
+      console.log('source', els[els.length - 2].id);
+      console.log('target', els[els.length - 1].id);
       return [
         ...els,
         {
           id: getEdgeId(),
-          source,
-          target
+          source: els[els.length - 2].id,
+          target: els[els.length - 1].id
         }
       ];
     });
-  }, []);
+  };
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -73,7 +107,7 @@ function App() {
         <ReactFlow
           elements={elements}
           onElementsRemove={onElementsRemove}
-          onConnect={addEdge}
+          onConnect={onConnect}
           deleteKeyCode={46} /* 'delete'-key */
         />
       </div>
