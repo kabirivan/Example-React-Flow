@@ -1,24 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import ReactFlow, { removeElements, addEdge, Connection, Edge, Elements, Position } from 'react-flow-renderer';
+
+const initialElements = [
+  {
+    id: '1',
+    type: 'input', // input node
+    data: { label: 'Start Node' },
+    draggable: false,
+    position: { x: 0, y: 50 },
+    sourcePosition: Position.Bottom,
+  },
+  // default node
+  {
+    id: '2',
+    type: 'output', 
+    // you can also pass a React component as a label
+    data: { label: <div>Default Node</div> },
+    draggable: true,
+    position: { x: 0, y: 150 },
+    sourcePosition: Position.Right,
+  },
+];
+
 
 function App() {
+  const [elements, setElements] = useState<a>(initialElements);
+  const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
+  const onConnect = (params: Edge<any> | Connection) => setElements((els) => addEdge(params, els));
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ height: 1200 }}>
+      <ReactFlow
+        elements={elements}
+        onElementsRemove={onElementsRemove}
+        onConnect={onConnect}
+        deleteKeyCode={46} /* 'delete'-key */
+      />
     </div>
   );
 }
