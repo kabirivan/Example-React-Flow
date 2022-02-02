@@ -30,7 +30,8 @@ const getEdgeId = () => `edge_${idEdge++}`;
 
 function App() {
   const [elements, setElements] = useState<Elements>(initialElements);
-  const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
+  const onElementsRemove = (elementsToRemove) =>
+    setElements((els) => removeElements(elementsToRemove, els));
   const onConnect = (params: Edge<any> | Connection) => setElements((els) => addEdge(params, els));
   const yPos = useRef(100);
 
@@ -63,43 +64,8 @@ function App() {
         }
       ];
     });
-    // addEdgeAutomatic()
   }, []);
 
-
-
-
-
-
-  // const addEdge = useCallback(({ source, target }) => {
-  //   setElements((els) => {
-  //     console.log(source, target);
-  //     return [
-  //       ...els,
-  //       {
-  //         id: getEdgeId(),
-  //         source,
-  //         target
-  //       }
-  //     ];
-  //   });
-  // }, []);
-
-
-  const addEdgeAutomatic = () => {
-    setElements((els) => {
-      console.log('source', els[els.length - 2].id);
-      console.log('target', els[els.length - 1].id);
-      return [
-        ...els,
-        {
-          id: getEdgeId(),
-          source: els[els.length - 2].id,
-          target: els[els.length - 1].id
-        }
-      ];
-    });
-  };
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -108,7 +74,6 @@ function App() {
           elements={elements}
           onElementsRemove={onElementsRemove}
           onConnect={onConnect}
-          deleteKeyCode={46} /* 'delete'-key */
         />
       </div>
       <button onClick={addNode}>Add</button>
